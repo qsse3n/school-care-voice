@@ -1,0 +1,3062 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>School Care Voice | AI School Issue Reporter</title>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --mint: #14b8a6;
+      --mint-dark: #0f766e;
+      --sky: #e0f2fe;
+      --mint-soft: #ccfbf1;
+      --cream: #fffaf0;
+      --pink-soft: #fce7f3;
+      --green-soft: #dcfce7;
+      --orange-soft: #ffedd5;
+      --red-soft: #fee2e2;
+      --ink: #102033;
+      --muted: #64748b;
+      --line: rgba(148, 163, 184, 0.28);
+      --card: rgba(255, 255, 255, 0.86);
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+      --shadow-hover: 0 24px 70px rgba(37, 99, 235, 0.16);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(20, 184, 166, 0.20), transparent 34%),
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 30%),
+        linear-gradient(180deg, #f8fbff 0%, #eef7f6 100%);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font-family: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .page-shell {
+      width: 94%;
+      max-width: 1200px;
+      margin: 0 auto 70px;
+    }
+
+    .hero-header {
+      color: white;
+      padding: 34px 0 46px;
+      background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(20, 184, 166, 0.92)),
+        radial-gradient(circle at top right, rgba(255,255,255,0.32), transparent 36%);
+      border-bottom-left-radius: 38px;
+      border-bottom-right-radius: 38px;
+      box-shadow: 0 24px 60px rgba(37, 99, 235, 0.24);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-header::before,
+    .hero-header::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+    }
+
+    .hero-header::before {
+      width: 280px;
+      height: 280px;
+      right: -80px;
+      top: -80px;
+    }
+
+    .hero-header::after {
+      width: 160px;
+      height: 160px;
+      left: -50px;
+      bottom: -70px;
+    }
+
+    .hero-inner {
+      width: 94%;
+      max-width: 1200px;
+      margin: auto;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.32);
+      backdrop-filter: blur(12px);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .hero-title {
+      margin: 16px 0 10px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -1.4px;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      max-width: 760px;
+      line-height: 1.75;
+      font-size: 17px;
+      opacity: 0.96;
+    }
+
+    .hero-actions {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 16px;
+      font-weight: 800;
+      font-size: 15px;
+      transition: 0.22s ease;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.18);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--mint));
+    }
+
+    .btn-light {
+      color: #0f172a;
+      background: rgba(255,255,255,0.88);
+    }
+
+    .btn-ghost {
+      color: #1e293b;
+      background: #e2e8f0;
+      box-shadow: none;
+    }
+
+    .btn-mint {
+      color: white;
+      background: linear-gradient(135deg, #0f766e, #14b8a6);
+    }
+
+    .btn-danger {
+      color: white;
+      background: #dc2626;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 38px rgba(37, 99, 235, 0.24);
+    }
+
+    .hero-visual {
+      min-height: 280px;
+      border-radius: 34px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.32);
+      backdrop-filter: blur(14px);
+      box-shadow: inset 0 0 40px rgba(255,255,255,0.16);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-mock {
+      width: min(320px, 100%);
+      margin: auto;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.92);
+      color: #102033;
+      padding: 16px;
+      box-shadow: 0 26px 70px rgba(15, 23, 42, 0.20);
+      transform: rotate(-2deg);
+    }
+
+    .phone-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mini-card {
+      padding: 12px;
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 10px;
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .mini-line {
+      height: 8px;
+      border-radius: 999px;
+      background: #cbd5e1;
+      margin: 6px 0;
+    }
+
+    .mini-line.short {
+      width: 62%;
+    }
+
+    .top-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .top-badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.17);
+      border: 1px solid rgba(255,255,255,0.30);
+      backdrop-filter: blur(10px);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .sticky-nav {
+      position: sticky;
+      top: 12px;
+      z-index: 30;
+      margin: -26px auto 22px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.78);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-btn {
+      padding: 11px 14px;
+      border-radius: 14px;
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 800;
+      transition: 0.22s ease;
+      margin: 0;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      background: #e0f2fe;
+    }
+
+    .nav-btn.active {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--mint));
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.20);
+    }
+
+    .tab {
+      display: none;
+    }
+
+    .tab.active {
+      display: block;
+      animation: softIn 0.25s ease;
+    }
+
+    @keyframes softIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-card {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.76);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-card.soft {
+      background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(240,253,250,0.78));
+    }
+
+    .section-title {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .section-title .icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: var(--sky);
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      margin: 0;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .step-grid,
+    .quick-grid,
+    .grid-4,
+    .grid-3,
+    .form-grid,
+    .map-grid,
+    .lab-process {
+      display: grid;
+      gap: 14px;
+    }
+
+    .step-grid,
+    .quick-grid,
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .map-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .lab-process {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .step-card,
+    .quick-card,
+    .stat-card,
+    .lab-process-card,
+    .map-card {
+      background: rgba(255,255,255,0.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      transition: 0.22s ease;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .step-card:hover,
+    .quick-card:hover,
+    .stat-card:hover,
+    .lab-process-card:hover,
+    .map-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .quick-card,
+    .map-card {
+      cursor: pointer;
+    }
+
+    .step-icon,
+    .quick-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--sky);
+      font-size: 23px;
+      margin-bottom: 12px;
+    }
+
+    .step-card h3,
+    .quick-card h3 {
+      margin: 0 0 7px;
+      font-size: 16px;
+    }
+
+    .step-card p,
+    .quick-card p,
+    .map-card p,
+    .lab-process-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.58;
+    }
+
+    .safety-note,
+    .notice,
+    .info {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 16px;
+      border-radius: 20px;
+      line-height: 1.68;
+      margin: 16px 0;
+    }
+
+    .safety-note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #7c2d12;
+    }
+
+    .notice {
+      background: #fff7ed;
+      border-left: 7px solid #f97316;
+      color: #7c2d12;
+    }
+
+    .info {
+      background: #eff6ff;
+      border-left: 7px solid var(--primary);
+      color: #1e3a8a;
+    }
+
+    .safety-note .icon,
+    .notice .icon,
+    .info .icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: 800;
+      margin: 14px 0 7px;
+      color: #1e293b;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.92);
+      color: var(--ink);
+      font-size: 15px;
+      outline: none;
+      transition: 0.22s ease;
+    }
+
+    textarea {
+      min-height: 128px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:hover,
+    textarea:hover,
+    select:hover {
+      border-color: #93c5fd;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+    }
+
+    .ai-box {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(239, 246, 255, 0.98), rgba(236, 253, 245, 0.92));
+      border-left: 7px solid var(--primary);
+      display: none;
+      line-height: 1.68;
+    }
+
+    .ai-box.show {
+      display: block;
+    }
+
+    .ai-row {
+      margin: 8px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      margin: 2px;
+      white-space: nowrap;
+    }
+
+    .badge-low { background: #dcfce7; color: #166534; }
+    .badge-medium { background: #fef9c3; color: #854d0e; }
+    .badge-high { background: #ffedd5; color: #9a3412; }
+    .badge-emergency { background: #fee2e2; color: #991b1b; }
+    .badge-status-wait { background: #e0f2fe; color: #075985; }
+    .badge-status-accept { background: #ede9fe; color: #5b21b6; }
+    .badge-status-process { background: #fef3c7; color: #92400e; }
+    .badge-status-done { background: #dcfce7; color: #166534; }
+    .badge-status-close { background: #e2e8f0; color: #334155; }
+
+    .stat-card h3 {
+      margin: 0;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .stat-card p {
+      margin: 10px 0 0;
+      font-size: 30px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.1;
+      word-break: break-word;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .issue-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 18px 24px;
+      margin-bottom: 14px;
+      background: rgba(255,255,255,0.82);
+      transition: 0.22s ease;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .issue-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 7px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--primary), var(--mint));
+    }
+
+    .issue-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .issue-card h3 {
+      margin: 0 0 8px;
+      color: #0f172a;
+      line-height: 1.35;
+    }
+
+    .issue-meta {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 10px;
+    }
+
+    .issue-summary {
+      background: #f8fafc;
+      padding: 13px;
+      border-radius: 16px;
+      margin: 10px 0;
+      line-height: 1.65;
+      border: 1px solid #e2e8f0;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .card-actions .btn {
+      padding: 9px 12px;
+      font-size: 13px;
+      border-radius: 14px;
+    }
+
+    .card-actions select {
+      max-width: 230px;
+      padding: 9px 12px;
+      border-radius: 14px;
+    }
+
+    .timeline {
+      border-left: 3px solid #cbd5e1;
+      padding-left: 12px;
+      margin-top: 12px;
+    }
+
+    .timeline-item {
+      margin-bottom: 9px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .preview-img,
+    .issue-img {
+      display: block;
+      max-width: 220px;
+      border-radius: 18px;
+      border: 1px solid #cbd5e1;
+      margin-top: 10px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 26px;
+      background: linear-gradient(135deg, #f8fafc, #f0fdfa);
+      border: 1px dashed #94a3b8;
+      border-radius: var(--radius-lg);
+      line-height: 1.7;
+    }
+
+    .empty::before {
+      content: "🌱";
+      display: block;
+      font-size: 34px;
+      margin-bottom: 8px;
+    }
+
+    .map-card {
+      min-height: 135px;
+      background: linear-gradient(135deg, #f8fafc, #eff6ff);
+    }
+
+    .map-card h3 {
+      margin: 0 0 10px;
+    }
+
+    .bar-row {
+      margin: 12px 0;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: #334155;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .bar-bg {
+      height: 13px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 5%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--primary), var(--mint));
+      transition: width 0.5s ease;
+    }
+
+    .lab-process-card {
+      text-align: center;
+      background: #f8fafc;
+    }
+
+    .lab-process-card .emoji {
+      font-size: 28px;
+    }
+
+    .lab-process-card strong {
+      display: block;
+      margin-top: 8px;
+      color: #0f172a;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 30px;
+      line-height: 1.7;
+    }
+
+    .fab-report {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 50;
+      width: 62px;
+      height: 62px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      background: linear-gradient(135deg, var(--primary), var(--mint));
+      color: white;
+      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.32);
+      transition: 0.22s ease;
+    }
+
+    .fab-report:hover {
+      transform: translateY(-4px) scale(1.04);
+    }
+
+    .toast-wrap {
+      position: fixed;
+      top: 22px;
+      right: 22px;
+      z-index: 100;
+      display: grid;
+      gap: 10px;
+    }
+
+    .toast {
+      min-width: 270px;
+      max-width: 380px;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.82);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      animation: toastIn 0.35s ease;
+      transition: 0.25s ease;
+    }
+
+    .toast-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .toast-title {
+      font-weight: 900;
+      margin-bottom: 3px;
+    }
+
+    .toast-text {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.44);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 90;
+      padding: 18px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .ai-modal {
+      width: min(720px, 100%);
+      background: white;
+      border-radius: 30px;
+      box-shadow: 0 30px 90px rgba(15, 23, 42, 0.30);
+      overflow: hidden;
+      animation: modalPop 0.28s ease;
+    }
+
+    @keyframes modalPop {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-head {
+      padding: 22px;
+      background: linear-gradient(135deg, #dbeafe, #ccfbf1);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .modal-head h3 {
+      margin: 0 0 6px;
+      font-size: 23px;
+    }
+
+    .modal-head p {
+      margin: 0;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .modal-close {
+      background: rgba(255,255,255,0.82);
+      color: #0f172a;
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .modal-body {
+      padding: 22px;
+    }
+
+    .modal-line {
+      padding: 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+      line-height: 1.65;
+    }
+
+    .modal-line:last-child {
+      border-bottom: none;
+    }
+
+    @media (max-width: 960px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        min-height: auto;
+      }
+
+      .step-grid,
+      .quick-grid,
+      .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-3,
+      .map-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .lab-process {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .hero-header {
+        border-bottom-left-radius: 28px;
+        border-bottom-right-radius: 28px;
+        padding-top: 26px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .sticky-nav {
+        position: static;
+      }
+
+      .nav-btn {
+        flex: 1 1 auto;
+      }
+
+      .step-grid,
+      .quick-grid,
+      .grid-4,
+      .form-grid,
+      .filters,
+      .lab-process {
+        grid-template-columns: 1fr;
+      }
+
+      .section-card {
+        padding: 18px;
+      }
+
+      .toast-wrap {
+        left: 14px;
+        right: 14px;
+      }
+
+      .toast {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .fab-report {
+        right: 16px;
+        bottom: 16px;
+      }
+
+      .phone-mock {
+        transform: none;
+      }
+    }
+
+    /* ==============================
+       V2 ADD-ON: Map Pins + Staff Gate
+       ============================== */
+    .map-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 0;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+    }
+
+    .map-toolbar .left,
+    .map-toolbar .right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .campus-map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .campus-map {
+      position: relative;
+      min-height: 560px;
+      border-radius: 30px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(148,163,184,0.14) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(148,163,184,0.14) 1px, transparent 1px),
+        radial-gradient(circle at 30% 20%, rgba(20,184,166,0.16), transparent 28%),
+        radial-gradient(circle at 70% 75%, rgba(37,99,235,0.14), transparent 30%),
+        linear-gradient(135deg, #f8fafc, #ecfeff);
+      background-size: 34px 34px, 34px 34px, auto, auto, auto;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.68), var(--shadow);
+    }
+
+    .campus-road {
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(148,163,184,0.20);
+      border: 1px dashed rgba(71,85,105,0.24);
+    }
+
+    .campus-road.main { left: 6%; right: 6%; top: 48%; height: 32px; }
+    .campus-road.vertical { top: 8%; bottom: 8%; left: 48%; width: 32px; }
+
+    .map-zone {
+      position: absolute;
+      border-radius: 24px;
+      padding: 12px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(148,163,184,0.34);
+      box-shadow: 0 14px 32px rgba(15,23,42,0.08);
+      transition: 0.22s ease;
+      overflow: hidden;
+    }
+
+    .map-zone:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .map-zone-title {
+      font-weight: 900;
+      font-size: 13px;
+      color: #0f172a;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .map-zone-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .map-pin {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px 999px 999px 8px;
+      transform: translate(-50%, -100%) rotate(-45deg);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      box-shadow: 0 12px 28px rgba(15,23,42,0.22);
+      border: 3px solid white;
+      cursor: pointer;
+      z-index: 5;
+      transition: 0.2s ease;
+    }
+
+    .map-pin span {
+      transform: rotate(45deg);
+      font-size: 14px;
+    }
+
+    .map-pin:hover {
+      z-index: 9;
+      transform: translate(-50%, -100%) rotate(-45deg) scale(1.14);
+    }
+
+    .map-pin.urgency-low { background: #22c55e; }
+    .map-pin.urgency-medium { background: #eab308; }
+    .map-pin.urgency-high { background: #f97316; }
+    .map-pin.urgency-emergency { background: #dc2626; animation: pinPulse 1.2s infinite; }
+
+    @keyframes pinPulse {
+      0%, 100% { box-shadow: 0 12px 28px rgba(220,38,38,0.20), 0 0 0 0 rgba(220,38,38,0.35); }
+      50% { box-shadow: 0 12px 28px rgba(220,38,38,0.24), 0 0 0 14px rgba(220,38,38,0); }
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+
+    .map-issue-panel {
+      border-radius: 26px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      min-height: 560px;
+      overflow: auto;
+      max-height: 620px;
+    }
+
+    .map-issue-panel h3 {
+      margin: 0 0 8px;
+    }
+
+    .map-mini-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .map-mini-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(15,23,42,0.10);
+    }
+
+    .staff-gate {
+      padding: 18px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff);
+      border: 1px solid rgba(37,99,235,0.16);
+      margin: 16px 0;
+    }
+
+    .staff-session-card {
+      display: none;
+      padding: 16px;
+      border-radius: 22px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      margin: 16px 0;
+      line-height: 1.65;
+    }
+
+    .staff-session-card.show {
+      display: block;
+    }
+
+    .admin-tools.locked {
+      filter: grayscale(0.25);
+      opacity: 0.42;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .locked-note {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .staff-only-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .staff-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    @media (max-width: 960px) {
+      .campus-map-layout { grid-template-columns: 1fr; }
+      .campus-map { min-height: 520px; }
+      .map-issue-panel { min-height: auto; max-height: none; }
+    }
+
+    @media (max-width: 620px) {
+      .campus-map { min-height: 470px; }
+      .map-zone { padding: 8px; border-radius: 18px; }
+      .map-zone-title { font-size: 11px; }
+      .map-zone-sub { display: none; }
+      .map-pin { width: 30px; height: 30px; }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="toastWrap" class="toast-wrap"></div>
+
+  <div id="aiModalBackdrop" class="modal-backdrop">
+    <div class="ai-modal">
+      <div class="modal-head">
+        <div>
+          <h3>AI วิเคราะห์ปัญหาเรียบร้อยแล้ว ✨</h3>
+          <p>ระบบช่วยจัดหมวดหมู่ ประเมินความเร่งด่วน และสรุปให้ครูอ่านง่ายขึ้น</p>
+        </div>
+        <button class="modal-close" onclick="closeAiModal()">×</button>
+      </div>
+      <div class="modal-body" id="aiModalBody">กำลังเตรียมผลวิเคราะห์...</div>
+    </div>
+  </div>
+
+  <button class="fab-report" onclick="openTab('reportTab')" title="แจ้งปัญหาใหม่">✍️</button>
+
+  <header class="hero-header">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">✨ วัดซับเบเบ้ Prototype</div>
+        <h1 class="hero-title">School Care Voice</h1>
+        <p class="hero-subtitle">
+          เว็บแอปแจ้งปัญหาในโรงเรียนด้วย AI ช่วยให้นักเรียนเล่าเรื่องที่พบได้ง่ายขึ้น
+          ระบบจะช่วยจัดหมวดหมู่ ประเมินความเร่งด่วน สรุปข้อมูล และส่งต่อให้ครูหรือฝ่ายที่เกี่ยวข้อง
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-light" onclick="openTab('reportTab'); setTimeout(() => document.getElementById('issueText').focus(), 80);">เริ่มแจ้งปัญหา</button>
+          <button class="btn btn-light" onclick="openTab('dashboardTab')">ดูภาพรวมโรงเรียน</button>
+          <button class="btn btn-light" onclick="openTab('labTab')">ดู AI Learning Lab</button>
+        </div>
+
+        <div class="top-badges">
+          <span class="top-badge">🤖 AI Classification</span>
+          <span class="top-badge">⚡ Urgency Scoring</span>
+          <span class="top-badge">📊 Dashboard</span>
+          <span class="top-badge">🧑‍🏫 Teacher Workflow</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="phone-mock">
+          <div class="phone-top">
+            <span>School Care Voice</span>
+            <span>online</span>
+          </div>
+          <div class="mini-card">
+            <strong>SCV-204921</strong>
+            <span class="badge badge-high">สูง</span>
+            <span class="badge badge-status-wait">รอรับเรื่อง</span>
+            <div class="mini-line"></div>
+            <div class="mini-line short"></div>
+          </div>
+          <div class="mini-card">
+            <strong>AI สรุป</strong>
+            <div class="mini-line"></div>
+            <div class="mini-line"></div>
+            <div class="mini-line short"></div>
+          </div>
+          <div class="mini-card">
+            <strong>Dashboard</strong>
+            <span class="badge badge-medium">ห้องน้ำ</span>
+            <span class="badge badge-low">แก้ไขแล้ว</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <nav class="sticky-nav">
+      <button class="nav-btn active" data-tab="reportTab">แจ้งปัญหา</button>
+      <button class="nav-btn" data-tab="feedTab">ติดตามปัญหา</button>
+      <button class="nav-btn" data-tab="mapTab">แผนที่โรงเรียน</button>
+      <button class="nav-btn" data-tab="voteTab">โหวตปัญหา</button>
+      <button class="nav-btn" data-tab="dashboardTab">Dashboard</button>
+      <button class="nav-btn" data-tab="labTab">AI Learning Lab</button>
+      <button class="nav-btn" data-tab="adminTab">สำหรับครู</button>
+    </nav>
+
+    <div id="reportTab" class="tab active">
+      <section class="section-card soft">
+        <div class="section-title">
+          <div class="icon">💙</div>
+          <div>
+            <h2>ให้โรงเรียนรับรู้ปัญหาได้ง่ายขึ้น</h2>
+            <p class="subtitle">
+              เล่าเรื่องที่พบในโรงเรียนได้ในไม่กี่ขั้นตอน ระบบจะใช้ AI ช่วยอ่านและสรุปให้เป็นเคสที่ติดตามได้
+            </p>
+          </div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-card">
+            <div class="step-icon">📝</div>
+            <h3>1. เล่าให้เราฟัง</h3>
+            <p>แจ้งปัญหาแบบเปิดเผยชื่อหรือไม่เปิดเผยชื่อได้</p>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">🤖</div>
+            <h3>2. AI ช่วยวิเคราะห์</h3>
+            <p>จัดหมวดหมู่ ประเมินความเร่งด่วน และสรุปข้อมูล</p>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">👩‍🏫</div>
+            <h3>3. ครูรับเรื่อง</h3>
+            <p>ฝ่ายที่เกี่ยวข้องเห็นเคสและอัปเดตสถานะได้</p>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">📍</div>
+            <h3>4. ติดตามผล</h3>
+            <p>ดูสถานะ กดเจอปัญหาเหมือนกัน และดูภาพรวมได้</p>
+          </div>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-card" onclick="document.getElementById('issueText').focus()">
+            <div class="quick-icon">➕</div>
+            <h3>แจ้งปัญหาใหม่</h3>
+            <p>เริ่มกรอกปัญหาที่พบในโรงเรียน</p>
+          </div>
+          <div class="quick-card" onclick="openTab('feedTab')">
+            <div class="quick-icon">🔥</div>
+            <h3>ดูปัญหาเร่งด่วน</h3>
+            <p>ติดตามเคสที่ควรได้รับการดูแลก่อน</p>
+          </div>
+          <div class="quick-card" onclick="openTab('dashboardTab')">
+            <div class="quick-icon">📊</div>
+            <h3>ภาพรวมโรงเรียน</h3>
+            <p>ดูหมวด พื้นที่ และสถานะของปัญหาทั้งหมด</p>
+          </div>
+          <div class="quick-card" onclick="openTab('adminTab')">
+            <div class="quick-icon">🧑‍🏫</div>
+            <h3>สำหรับครู</h3>
+            <p>อัปเดตสถานะและบันทึกการดำเนินงาน</p>
+          </div>
+        </div>
+
+        <div class="safety-note">
+          <div class="icon">🛟</div>
+          <div>
+            <strong>หมายเหตุด้านความปลอดภัย :</strong>
+            หากเป็นเรื่องการบูลลี่ ความเครียด สุขภาพใจ หรือเหตุที่เสี่ยงต่ออันตราย
+            ระบบนี้ช่วยส่งต่อเบื้องต้นเท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์
+            และควรแจ้งครูที่ไว้ใจหรือผู้ใหญ่ใกล้ตัวทันทีเมื่อรู้สึกไม่ปลอดภัย
+          </div>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="section-title">
+          <div class="icon">📝</div>
+          <div>
+            <h2>แจ้งปัญหาในโรงเรียน</h2>
+            <p class="subtitle">
+              ใช้ภาษาธรรมดาได้เลย เช่น “พื้นหน้าห้องน้ำลื่นมาก มีคนเกือบล้ม”
+            </p>
+          </div>
+        </div>
+
+        <form id="issueForm">
+          <div class="form-grid">
+            <div>
+              <label for="reporterRole">สถานะผู้แจ้ง</label>
+              <select id="reporterRole">
+                <option value="นักเรียน">นักเรียน</option>
+                <option value="ครู">ครู</option>
+                <option value="บุคลากร">บุคลากร</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="anonymous">การเปิดเผยตัวตน</label>
+              <select id="anonymous">
+                <option value="ไม่เปิดเผยชื่อ">ไม่เปิดเผยชื่อ</option>
+                <option value="เปิดเผยชื่อ">เปิดเผยชื่อ</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="studentName">ชื่อผู้แจ้ง</label>
+              <input id="studentName" type="text" placeholder="เช่น นักเรียน ม.5/1 หรือเว้นว่างได้" />
+            </div>
+
+            <div>
+              <label for="location">พื้นที่เกิดปัญหา</label>
+              <select id="location" required>
+                <option value="">-- เลือกพื้นที่ --</option>
+                <option value="อาคาร 1">อาคาร 1</option>
+                <option value="อาคาร 2">อาคาร 2</option>
+                <option value="อาคาร 3">อาคาร 3</option>
+                <option value="ห้องน้ำ">ห้องน้ำ</option>
+                <option value="โรงอาหาร">โรงอาหาร</option>
+                <option value="สนามกีฬา">สนามกีฬา</option>
+                <option value="ห้องเรียน">ห้องเรียน</option>
+                <option value="ทางเดิน/บันได">ทางเดิน/บันได</option>
+                <option value="หน้าโรงเรียน">หน้าโรงเรียน</option>
+                <option value="อื่น ๆ">อื่น ๆ</option>
+              </select>
+            </div>
+
+            <div class="full">
+              <label for="subLocation">รายละเอียดสถานที่เพิ่มเติม</label>
+              <input id="subLocation" type="text" placeholder="เช่น ห้องน้ำหญิงชั้น 3, หน้าห้อง ม.5/2, ข้างโรงอาหาร" />
+            </div>
+
+            <div class="full">
+              <label for="issueText">เล่าให้เราฟังได้เลยว่าเกิดอะไรขึ้น</label>
+              <textarea id="issueText" placeholder="เช่น พื้นหน้าห้องน้ำลื่นมาก มีคนเกือบล้มหลายครั้ง อยากให้ช่วยติดป้ายเตือนหรือทำความสะอาดเร็ว ๆ" required></textarea>
+            </div>
+
+            <div class="full">
+              <label for="imageInput">แนบรูปภาพประกอบ ถ้ามี</label>
+              <input id="imageInput" type="file" accept="image/*" />
+              <div id="imagePreview"></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" type="submit">ส่งปัญหาให้ AI วิเคราะห์</button>
+        </form>
+
+        <div id="aiResult" class="ai-box">
+          <h3>ผลวิเคราะห์จาก AI</h3>
+          <div class="ai-row"><strong>เลขเคส:</strong> <span id="resultTicket">-</span></div>
+          <div class="ai-row"><strong>หมวดหมู่:</strong> <span id="resultCategory">-</span></div>
+          <div class="ai-row"><strong>ระดับความเร่งด่วน:</strong> <span id="resultUrgency">-</span></div>
+          <div class="ai-row"><strong>หน่วยงานที่ควรรับผิดชอบ:</strong> <span id="resultDepartment">-</span></div>
+          <div class="ai-row"><strong>สรุปให้ครู:</strong> <span id="resultSummary">-</span></div>
+          <div class="ai-row"><strong>ปัญหาคล้ายกัน:</strong> <span id="resultSimilar">-</span></div>
+        </div>
+      </section>
+    </div>
+
+    <section id="feedTab" class="tab section-card">
+      <div class="section-title">
+        <div class="icon">🔎</div>
+        <div>
+          <h2>ติดตามปัญหาทั้งหมด</h2>
+          <p class="subtitle">ค้นหา กรองปัญหา ดูสถานะ และกดสนับสนุนปัญหาที่พบเหมือนกันได้</p>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input id="searchInput" type="text" placeholder="ค้นหา เช่น ห้องน้ำ ลื่น บูลลี่ พัดลม" />
+        <select id="filterCategory"><option value="ทั้งหมด">ทุกหมวด</option></select>
+        <select id="filterUrgency">
+          <option value="ทั้งหมด">ทุกความเร่งด่วน</option>
+          <option value="ต่ำ">ต่ำ</option>
+          <option value="กลาง">กลาง</option>
+          <option value="สูง">สูง</option>
+          <option value="ฉุกเฉิน">ฉุกเฉิน</option>
+        </select>
+        <select id="filterStatus">
+          <option value="ทั้งหมด">ทุกสถานะ</option>
+          <option value="รอรับเรื่อง">รอรับเรื่อง</option>
+          <option value="รับเรื่องแล้ว">รับเรื่องแล้ว</option>
+          <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+          <option value="แก้ไขแล้ว">แก้ไขแล้ว</option>
+          <option value="ปิดเคส">ปิดเคส</option>
+        </select>
+        <select id="filterLocation"><option value="ทั้งหมด">ทุกพื้นที่</option></select>
+      </div>
+
+      <div id="issueList"></div>
+    </section>
+
+    <section id="mapTab" class="tab section-card">
+      <div class="section-title">
+        <div class="icon">🗺️</div>
+        <div>
+          <h2>แผนที่โรงเรียนพร้อมหมุดแจ้งเตือน</h2>
+          <p class="subtitle">
+            แสดงตำแหน่งปัญหาบนแผนที่โรงเรียนแบบจำลอง คล้ายระบบรับแจ้งปัญหาเมือง
+            เพื่อให้เห็นทันทีว่ามีปัญหาอยู่ตรงไหน จุดไหนเร่งด่วน และใครรับผิดชอบอยู่
+          </p>
+        </div>
+      </div>
+
+      <div class="map-toolbar">
+        <div class="left">
+          <span class="staff-only-chip">📍 Campus Issue Map</span>
+          <div class="map-legend">
+            <span><i class="legend-dot" style="background:#22c55e"></i>ต่ำ</span>
+            <span><i class="legend-dot" style="background:#eab308"></i>กลาง</span>
+            <span><i class="legend-dot" style="background:#f97316"></i>สูง</span>
+            <span><i class="legend-dot" style="background:#dc2626"></i>ฉุกเฉิน</span>
+          </div>
+        </div>
+        <div class="right">
+          <select id="mapFilterStatus">
+            <option value="ทั้งหมด">ทุกสถานะ</option>
+            <option value="รอรับเรื่อง">รอรับเรื่อง</option>
+            <option value="รับเรื่องแล้ว">รับเรื่องแล้ว</option>
+            <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+            <option value="แก้ไขแล้ว">แก้ไขแล้ว</option>
+            <option value="ปิดเคส">ปิดเคส</option>
+          </select>
+          <button class="btn btn-ghost" onclick="resetMapPanel()">ดูทุกหมุด</button>
+        </div>
+      </div>
+
+      <div class="campus-map-layout">
+        <div id="schoolMap" class="campus-map"></div>
+        <div id="mapIssuePanel" class="map-issue-panel">
+          <h3>เลือกหมุดบนแผนที่</h3>
+          <p class="subtitle">คลิกหมุดเพื่อดูรายละเอียดปัญหา หรือคลิกพื้นที่เพื่อกรองรายการตามจุดในโรงเรียน</p>
+          <div id="mapPanelContent"></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:22px;">สรุปตามพื้นที่</h3>
+      <div id="mapAreaStats" class="map-grid"></div>
+    </section>
+
+    <section id="voteTab" class="tab section-card">
+      <div class="section-title">
+        <div class="icon">🙋</div>
+        <div>
+          <h2>โหวตปัญหาที่ควรแก้ก่อน</h2>
+          <p class="subtitle">นักเรียนสามารถกด “เจอปัญหานี้เหมือนกัน” เพื่อช่วยให้โรงเรียนรู้ว่าปัญหาไหนกระทบคนจำนวนมาก</p>
+        </div>
+      </div>
+      <div id="voteList"></div>
+    </section>
+
+    <section id="dashboardTab" class="tab section-card">
+      <div class="section-title">
+        <div class="icon">📊</div>
+        <div>
+          <h2>Dashboard สำหรับผู้บริหาร/ครู</h2>
+          <p class="subtitle">สรุปจำนวนปัญหา ปัญหาเร่งด่วน สถานะการแก้ไข พื้นที่เสี่ยง และหมวดปัญหาที่เกิดบ่อย</p>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <div class="stat-card"><h3>ปัญหาทั้งหมด</h3><p id="totalIssues">0</p></div>
+        <div class="stat-card"><h3>เร่งด่วนสูง/ฉุกเฉิน</h3><p id="urgentIssues">0</p></div>
+        <div class="stat-card"><h3>แก้ไขแล้ว/ปิดเคส</h3><p id="solvedIssues">0</p></div>
+        <div class="stat-card"><h3>คนกดเจอเหมือนกัน</h3><p id="totalVotes">0</p></div>
+      </div>
+
+      <div class="grid-3" style="margin-top: 18px;">
+        <div class="stat-card"><h3>หมวดที่พบบ่อย</h3><p id="topCategory">-</p></div>
+        <div class="stat-card"><h3>พื้นที่ที่แจ้งมากสุด</h3><p id="topLocation">-</p></div>
+        <div class="stat-card"><h3>สถานะที่ค้างมากสุด</h3><p id="topStatus">-</p></div>
+      </div>
+
+      <div class="grid-3" style="margin-top: 22px;">
+        <div>
+          <h3>หมวดปัญหา</h3>
+          <div id="categoryChart"></div>
+        </div>
+        <div>
+          <h3>พื้นที่เกิดปัญหา</h3>
+          <div id="locationChart"></div>
+        </div>
+        <div>
+          <h3>สถานะปัญหา</h3>
+          <div id="statusChart"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="labTab" class="tab section-card">
+      <div class="section-title">
+        <div class="icon">🧠</div>
+        <div>
+          <h2>AI Learning Lab</h2>
+          <p class="subtitle">
+            ห้องทดลองนี้แสดงกระบวนการสร้าง AI ตามแนวคิด Machine Learning Life Cycle :
+            Dataset → Feature Extraction → Training → Testing → Deploy
+          </p>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="icon">🔬</div>
+        <div>
+          Prototype นี้ใช้โมเดลขนาดเล็กที่เรียนรู้จากข้อความแจ้งปัญหาจำลอง
+          ระบบจะดูคำสำคัญ เช่น “ลื่น”, “ห้องน้ำ”, “บูลลี่”, “เครียด”, “พัดลมเสีย”
+          แล้วทำนายหมวดหมู่ของปัญหา
+        </div>
+      </div>
+
+      <div class="lab-process">
+        <div class="lab-process-card"><div class="emoji">📦</div><strong>Dataset</strong><p>ข้อมูลตัวอย่าง</p></div>
+        <div class="lab-process-card"><div class="emoji">🔎</div><strong>Feature</strong><p>ดึงคำสำคัญ</p></div>
+        <div class="lab-process-card"><div class="emoji">🧠</div><strong>Training</strong><p>ฝึกโมเดล</p></div>
+        <div class="lab-process-card"><div class="emoji">🧪</div><strong>Testing</strong><p>ทดสอบผล</p></div>
+        <div class="lab-process-card"><div class="emoji">🚀</div><strong>Deploy</strong><p>ใช้ในเว็บจริง</p></div>
+      </div>
+
+      <div class="grid-4">
+        <div class="stat-card"><h3>จำนวนข้อมูลฝึก</h3><p id="labDatasetCount">0</p></div>
+        <div class="stat-card"><h3>จำนวนหมวดปัญหา</h3><p id="labCategoryCount">0</p></div>
+        <div class="stat-card"><h3>Accuracy จำลอง</h3><p id="labAccuracy">-</p></div>
+        <div class="stat-card"><h3>สถานะโมเดล</h3><p id="labModelStatus">ยังไม่ Train</p></div>
+      </div>
+
+      <button id="trainModelBtn" class="btn btn-mint" style="margin-top:16px;">Train AI Model</button>
+
+      <div style="margin-top:22px;">
+        <h2>Dataset ตัวอย่าง</h2>
+        <p class="subtitle">ข้อมูลตัวอย่างที่ใช้ฝึก AI เป็นข้อความแจ้งปัญหาในโรงเรียนพร้อม Label หมวดหมู่</p>
+        <div id="labDatasetTable"></div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <h2>Feature Extraction</h2>
+        <p class="subtitle">ระบบดึงคำสำคัญจากข้อความ เพื่อใช้เป็นคุณลักษณะให้โมเดลเรียนรู้</p>
+        <div id="labFeatureBox" class="issue-summary">ยังไม่ได้ Train Model</div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <h2>ทดลองทำนายข้อความใหม่</h2>
+        <label for="labTestInput">พิมพ์ข้อความแจ้งปัญหา</label>
+        <textarea id="labTestInput" placeholder="เช่น มีคนโดนล้อในห้องบ่อยมากจนไม่อยากมาโรงเรียน"></textarea>
+        <button id="labPredictBtn" class="btn btn-primary">ให้ AI ทำนายหมวดปัญหา</button>
+
+        <div id="labPredictResult" class="ai-box">
+          <h3>ผลการทำนายจากโมเดล</h3>
+          <div class="ai-row"><strong>หมวดที่ AI ทำนาย :</strong> <span id="labPredictedCategory">-</span></div>
+          <div class="ai-row"><strong>คะแนนความมั่นใจ :</strong> <span id="labConfidence">-</span></div>
+          <div class="ai-row"><strong>คำที่ AI ใช้ตัดสินใจ :</strong> <span id="labMatchedWords">-</span></div>
+        </div>
+      </div>
+
+      <div class="notice">
+        <div class="icon">🚀</div>
+        <div>
+          หลังจาก Train แล้ว แนวคิดของโมเดลนี้สามารถนำไปใช้ในหน้าแจ้งปัญหาจริง
+          เพื่อช่วยจัดหมวดหมู่ปัญหา ประเมินความเร่งด่วน และส่งต่อให้ฝ่ายที่เกี่ยวข้อง
+          โดยเวอร์ชันปัจจุบันเป็น Prototype ที่ใช้ข้อมูลจำลองและโมเดลขนาดเล็ก
+        </div>
+      </div>
+    </section>
+
+    <section id="adminTab" class="tab section-card">
+      <div class="section-title">
+        <div class="icon">🧑‍🏫</div>
+        <div>
+          <h2>สำหรับครู / เจ้าหน้าที่โรงเรียน</h2>
+          <p class="subtitle">
+            ส่วนนี้ล็อกไว้สำหรับครูหรือเจ้าหน้าที่เท่านั้น เพื่อป้องกันนักเรียนเปลี่ยนสถานะ รับงาน หรือปั่นระบบแทนผู้รับผิดชอบ
+          </p>
+        </div>
+      </div>
+
+      <div id="staffGate" class="staff-gate">
+        <div class="section-title" style="margin-bottom:6px;">
+          <div class="icon">🔐</div>
+          <div>
+            <h2>เข้าสู่โหมดเจ้าหน้าที่</h2>
+            <p class="subtitle">
+              Prototype นี้ใช้รหัสเดโมเพื่อแยกสิทธิ์ระหว่างนักเรียนกับเจ้าหน้าที่
+              งานจริงควรต่อยอดเป็นระบบ Login ของโรงเรียนหรือบัญชีครูจริง
+            </p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label for="staffRoleSelect">เลือกบทบาทเจ้าหน้าที่</label>
+            <select id="staffRoleSelect">
+              <option value="ครูเวร/งานความปลอดภัย">ครูเวร / งานความปลอดภัย</option>
+              <option value="งานอาคารสถานที่">งานอาคารสถานที่</option>
+              <option value="งานแนะแนว/ครูที่ปรึกษา">งานแนะแนว / ครูที่ปรึกษา</option>
+              <option value="งานอนามัย/แม่บ้าน">งานอนามัย / แม่บ้าน</option>
+              <option value="ฝ่ายบริหารทั่วไป">ฝ่ายบริหารทั่วไป</option>
+            </select>
+          </div>
+          <div>
+            <label for="staffCodeInput">รหัสเจ้าหน้าที่</label>
+            <input id="staffCodeInput" type="password" placeholder="ใส่รหัสเดโม เช่น SAFE123" />
+          </div>
+        </div>
+
+        <button id="staffLoginBtn" class="btn btn-primary">เข้าสู่ระบบเจ้าหน้าที่</button>
+        <button id="staffDemoBtn" class="btn btn-ghost">ดูรหัสเดโม</button>
+      </div>
+
+      <div id="staffSessionCard" class="staff-session-card"></div>
+
+      <div id="adminTools" class="admin-tools locked">
+        <div class="info">
+          <div class="icon">📌</div>
+          <div>
+            ตัวอย่างการใช้งาน: เจ้าหน้าที่เลือกเคส → กดรับงานหรือเปลี่ยนสถานะ → ใส่บันทึก เช่น “แจ้งงานอาคารแล้ว”
+            ระบบจะบันทึก Timeline ของเคสนั้นทันที
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="full">
+            <label for="adminIssueSelect">เลือกเคส</label>
+            <select id="adminIssueSelect"></select>
+          </div>
+
+          <div>
+            <label for="adminStatus">สถานะใหม่</label>
+            <select id="adminStatus">
+              <option value="รอรับเรื่อง">รอรับเรื่อง</option>
+              <option value="รับเรื่องแล้ว">รับเรื่องแล้ว</option>
+              <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+              <option value="แก้ไขแล้ว">แก้ไขแล้ว</option>
+              <option value="ปิดเคส">ปิดเคส</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="adminDepartment">ส่งต่อให้ฝ่าย</label>
+            <select id="adminDepartment">
+              <option value="งานอาคารสถานที่">งานอาคารสถานที่</option>
+              <option value="ครูเวร/งานความปลอดภัย">ครูเวร/งานความปลอดภัย</option>
+              <option value="งานแนะแนว/ครูที่ปรึกษา">งานแนะแนว/ครูที่ปรึกษา</option>
+              <option value="งานอนามัย/แม่บ้าน">งานอนามัย/แม่บ้าน</option>
+              <option value="ฝ่ายบริหารทั่วไป">ฝ่ายบริหารทั่วไป</option>
+              <option value="สภานักเรียน">สภานักเรียน</option>
+            </select>
+          </div>
+
+          <div class="full">
+            <label for="adminNote">บันทึกการดำเนินงาน</label>
+            <textarea id="adminNote" placeholder="เช่น รับเรื่องแล้ว แจ้งงานอาคารสถานที่ให้ตรวจสอบภายในวันนี้"></textarea>
+          </div>
+        </div>
+
+        <button id="acceptSelectedBtn" class="btn btn-primary">รับเคสนี้เป็นงานของฉัน</button>
+        <button id="adminUpdateBtn" class="btn btn-mint">บันทึกการอัปเดต</button>
+        <button id="exportBtn" class="btn btn-ghost">Export CSV</button>
+        <button id="resetBtn" class="btn btn-danger">รีเซ็ตข้อมูลเดโม</button>
+      </div>
+    </section>
+
+    <div class="footer">
+      School Care Voice | Prototype สำหรับ OBEC AI Spark Thailand Challenge<br />
+      ใช้ HTML + CSS + JavaScript, LocalStorage, Rule-based NLP และ AI Learning Lab จำลองกระบวนการเรียนรู้ของโมเดล
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "school_care_voice_modern_v2";
+    const STAFF_SESSION_KEY = "school_care_voice_staff_session_v2";
+    const VOTED_ISSUES_KEY = "school_care_voice_voted_issues_v2";
+    let activeImageData = "";
+    let labModel = null;
+
+    const locations = [
+      "อาคาร 1", "อาคาร 2", "อาคาร 3", "ห้องน้ำ", "โรงอาหาร",
+      "สนามกีฬา", "ห้องเรียน", "ทางเดิน/บันได", "หน้าโรงเรียน", "อื่น ๆ"
+    ];
+
+    const staffAccounts = [
+      { role: "ครูเวร/งานความปลอดภัย", name: "ครูเวร", code: "SAFE123", department: "ครูเวร/งานความปลอดภัย" },
+      { role: "งานอาคารสถานที่", name: "เจ้าหน้าที่อาคาร", code: "BUILD123", department: "งานอาคารสถานที่" },
+      { role: "งานแนะแนว/ครูที่ปรึกษา", name: "ครูแนะแนว", code: "CARE123", department: "งานแนะแนว/ครูที่ปรึกษา" },
+      { role: "งานอนามัย/แม่บ้าน", name: "งานอนามัย", code: "HEALTH123", department: "งานอนามัย/แม่บ้าน" },
+      { role: "ฝ่ายบริหารทั่วไป", name: "ฝ่ายบริหาร", code: "ADMIN123", department: "ฝ่ายบริหารทั่วไป" }
+    ];
+
+    let staffSession = loadStaffSession();
+    let voteRecord = loadVoteRecord();
+
+    const locationMapData = {
+      "อาคาร 1": { x: 20, y: 20, w: 22, h: 20, icon: "🏢", label: "อาคาร 1" },
+      "อาคาร 2": { x: 56, y: 18, w: 24, h: 22, icon: "🏫", label: "อาคาร 2" },
+      "อาคาร 3": { x: 18, y: 63, w: 25, h: 20, icon: "🏬", label: "อาคาร 3" },
+      "ห้องน้ำ": { x: 78, y: 52, w: 15, h: 16, icon: "🚻", label: "ห้องน้ำ" },
+      "โรงอาหาร": { x: 54, y: 68, w: 23, h: 18, icon: "🍽️", label: "โรงอาหาร" },
+      "สนามกีฬา": { x: 8, y: 36, w: 30, h: 20, icon: "⚽", label: "สนามกีฬา" },
+      "ห้องเรียน": { x: 44, y: 42, w: 20, h: 16, icon: "📚", label: "ห้องเรียน" },
+      "ทางเดิน/บันได": { x: 42, y: 51, w: 18, h: 12, icon: "🪜", label: "ทางเดิน/บันได" },
+      "หน้าโรงเรียน": { x: 42, y: 88, w: 22, h: 8, icon: "🚪", label: "หน้าโรงเรียน" },
+      "อื่น ๆ": { x: 78, y: 78, w: 14, h: 12, icon: "📌", label: "อื่น ๆ" }
+    };
+
+    const defaultIssues = [
+      {
+        id: 1001,
+        ticket: "SCV-1001",
+        role: "นักเรียน",
+        name: "ไม่เปิดเผยชื่อ",
+        location: "ห้องน้ำ",
+        subLocation: "ห้องน้ำหญิงชั้น 3",
+        text: "ห้องน้ำหญิงชั้น 3 น้ำไม่ไหลและมีกลิ่นเหม็นมาก ใช้งานไม่ได้หลายวันแล้ว",
+        category: "ห้องน้ำ/สุขอนามัย",
+        urgency: "สูง",
+        department: "งานอาคารสถานที่",
+        summary: "พบปัญหาห้องน้ำหญิงชั้น 3 น้ำไม่ไหลและมีกลิ่นเหม็น ส่งผลต่อสุขอนามัย ควรตรวจสอบโดยเร็ว",
+        status: "รอรับเรื่อง",
+        votes: 8,
+        imageData: "",
+        createdAt: "วันนี้ 08:20",
+        timeline: [
+          { time: "วันนี้ 08:20", status: "รอรับเรื่อง", note: "ระบบรับเรื่องจากนักเรียนแล้ว" }
+        ]
+      },
+      {
+        id: 1002,
+        ticket: "SCV-1002",
+        role: "นักเรียน",
+        name: "นักเรียน ม.5/2",
+        location: "ห้องเรียน",
+        subLocation: "ห้อง ม.5/2",
+        text: "พัดลมห้องเรียนเสีย อากาศร้อนมาก เรียนไม่ค่อยไหว",
+        category: "อุปกรณ์ชำรุด",
+        urgency: "กลาง",
+        department: "งานอาคารสถานที่",
+        summary: "พบปัญหาพัดลมห้องเรียนชำรุด ส่งผลต่อสภาพแวดล้อมการเรียน ควรตรวจซ่อม",
+        status: "กำลังดำเนินการ",
+        votes: 5,
+        imageData: "",
+        createdAt: "วันนี้ 09:05",
+        timeline: [
+          { time: "วันนี้ 09:05", status: "รอรับเรื่อง", note: "ระบบรับเรื่องจากนักเรียนแล้ว" },
+          { time: "วันนี้ 09:40", status: "กำลังดำเนินการ", note: "แจ้งงานอาคารสถานที่แล้ว" }
+        ]
+      },
+      {
+        id: 1003,
+        ticket: "SCV-1003",
+        role: "นักเรียน",
+        name: "ไม่เปิดเผยชื่อ",
+        location: "ทางเดิน/บันได",
+        subLocation: "บันไดอาคาร 2",
+        text: "พื้นตรงบันไดลื่นมาก มีคนเกือบล้มหลายครั้ง",
+        category: "ความปลอดภัย",
+        urgency: "สูง",
+        department: "ครูเวร/งานความปลอดภัย",
+        summary: "พบพื้นที่เสี่ยงบริเวณบันได มีความเสี่ยงต่อการลื่นล้ม ควรติดป้ายเตือนและแก้ไขทันที",
+        status: "รับเรื่องแล้ว",
+        votes: 12,
+        imageData: "",
+        createdAt: "วันนี้ 09:30",
+        timeline: [
+          { time: "วันนี้ 09:30", status: "รอรับเรื่อง", note: "ระบบรับเรื่องจากนักเรียนแล้ว" },
+          { time: "วันนี้ 09:45", status: "รับเรื่องแล้ว", note: "ครูเวรรับเรื่องและตรวจสอบพื้นที่" }
+        ]
+      },
+      {
+        id: 1004,
+        ticket: "SCV-1004",
+        role: "นักเรียน",
+        name: "ไม่เปิดเผยชื่อ",
+        location: "โรงอาหาร",
+        subLocation: "ข้างโรงอาหาร",
+        text: "ขยะล้นถังข้างโรงอาหาร มีกลิ่นและแมลงเยอะ",
+        category: "สิ่งแวดล้อม/ความสะอาด",
+        urgency: "กลาง",
+        department: "งานอนามัย/แม่บ้าน",
+        summary: "พบปัญหาขยะล้นบริเวณโรงอาหาร ส่งผลต่อความสะอาดและสุขอนามัย ควรจัดเก็บเพิ่ม",
+        status: "แก้ไขแล้ว",
+        votes: 9,
+        imageData: "",
+        createdAt: "เมื่อวาน 12:10",
+        timeline: [
+          { time: "เมื่อวาน 12:10", status: "รอรับเรื่อง", note: "ระบบรับเรื่องจากนักเรียนแล้ว" },
+          { time: "เมื่อวาน 13:00", status: "กำลังดำเนินการ", note: "ประสานงานแม่บ้านให้จัดเก็บขยะ" },
+          { time: "เมื่อวาน 14:20", status: "แก้ไขแล้ว", note: "จัดเก็บขยะและเพิ่มถังขยะแล้ว" }
+        ]
+      },
+      {
+        id: 1005,
+        ticket: "SCV-1005",
+        role: "นักเรียน",
+        name: "ไม่เปิดเผยชื่อ",
+        location: "ห้องเรียน",
+        subLocation: "ห้อง ม.4/3",
+        text: "มีเพื่อนโดนล้อและโดนด่าในห้องบ่อย ๆ แต่ไม่กล้าบอกครู",
+        category: "การบูลลี่/ความสัมพันธ์",
+        urgency: "สูง",
+        department: "งานแนะแนว/ครูที่ปรึกษา",
+        summary: "พบปัญหาการล้อเลียนและใช้คำพูดรุนแรงในห้องเรียน ควรส่งต่อครูที่ปรึกษาหรืองานแนะแนวอย่างระมัดระวัง",
+        status: "รอรับเรื่อง",
+        votes: 4,
+        imageData: "",
+        createdAt: "วันนี้ 10:15",
+        timeline: [
+          { time: "วันนี้ 10:15", status: "รอรับเรื่อง", note: "ระบบรับเรื่องจากนักเรียนแล้ว" }
+        ]
+      },
+      {
+        id: 1006,
+        ticket: "SCV-1006",
+        role: "นักเรียน",
+        name: "ไม่เปิดเผยชื่อ",
+        location: "สนามกีฬา",
+        subLocation: "ขอบสนาม",
+        text: "มีเศษแก้วแตกแถวสนามกีฬา กลัวคนเหยียบแล้วบาดเจ็บ",
+        category: "ความปลอดภัย",
+        urgency: "ฉุกเฉิน",
+        department: "ครูเวร/งานความปลอดภัย",
+        summary: "พบเศษแก้วแตกบริเวณสนามกีฬา มีความเสี่ยงต่อการบาดเจ็บ ควรรีบกันพื้นที่และเก็บกวาดทันที",
+        status: "รับเรื่องแล้ว",
+        votes: 15,
+        imageData: "",
+        createdAt: "วันนี้ 11:05",
+        timeline: [
+          { time: "วันนี้ 11:05", status: "รอรับเรื่อง", note: "ระบบรับเรื่องจากนักเรียนแล้ว" },
+          { time: "วันนี้ 11:10", status: "รับเรื่องแล้ว", note: "ครูเวรรับเรื่องและแจ้งแม่บ้านเข้าตรวจสอบ" }
+        ]
+      }
+    ];
+
+    const labDataset = [
+      { text: "ห้องน้ำหญิงชั้น 3 น้ำไม่ไหลและมีกลิ่นเหม็น", label: "ห้องน้ำ/สุขอนามัย" },
+      { text: "ห้องน้ำชายสกปรกมาก ไม่มีคนทำความสะอาด", label: "ห้องน้ำ/สุขอนามัย" },
+      { text: "พื้นหน้าห้องน้ำลื่น มีคนเกือบล้ม", label: "ความปลอดภัย" },
+      { text: "สายไฟข้างห้องเรียนชำรุด กลัวเกิดอันตราย", label: "ความปลอดภัย" },
+      { text: "มีเพื่อนโดนล้อและโดนด่าทุกวัน", label: "การบูลลี่/ความสัมพันธ์" },
+      { text: "เพื่อนถูกแกล้งในห้องแต่ไม่กล้าบอกครู", label: "การบูลลี่/ความสัมพันธ์" },
+      { text: "รู้สึกเครียดมาก ไม่อยากมาโรงเรียน", label: "สุขภาพใจ" },
+      { text: "นักเรียนรู้สึกเศร้าและร้องไห้บ่อย", label: "สุขภาพใจ" },
+      { text: "พัดลมห้องเรียนเสีย อากาศร้อนมาก", label: "อุปกรณ์ชำรุด" },
+      { text: "โปรเจกเตอร์ในห้องเรียนเปิดไม่ติด", label: "อุปกรณ์ชำรุด" },
+      { text: "ขยะล้นถังข้างโรงอาหาร มีกลิ่นเหม็น", label: "สิ่งแวดล้อม/ความสะอาด" },
+      { text: "มีน้ำขังและยุงเยอะหลังฝนตก", label: "สิ่งแวดล้อม/ความสะอาด" },
+      { text: "ห้องเรียนเสียงดังมากจนเรียนไม่รู้เรื่อง", label: "การเรียน/สภาพแวดล้อม" },
+      { text: "อินเทอร์เน็ตในห้องเรียนช้ามาก ใช้เรียนไม่ได้", label: "การเรียน/สภาพแวดล้อม" }
+    ];
+
+    let issues = loadIssues();
+
+    const imageInput = document.getElementById("imageInput");
+    const imagePreview = document.getElementById("imagePreview");
+    const issueForm = document.getElementById("issueForm");
+
+    document.querySelectorAll(".nav-btn").forEach(button => {
+      button.addEventListener("click", () => openTab(button.dataset.tab));
+    });
+
+    function openTab(tabId) {
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tabId);
+      });
+
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.toggle("active", tab.id === tabId);
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderAll();
+    }
+
+    function loadIssues() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return JSON.parse(JSON.stringify(defaultIssues));
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return JSON.parse(JSON.stringify(defaultIssues));
+      }
+    }
+
+    function saveIssues() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
+    }
+
+    function getTodayKey() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function loadVoteRecord() {
+      const today = getTodayKey();
+      const saved = localStorage.getItem(VOTED_ISSUES_KEY);
+
+      if (!saved) {
+        return {
+          date: today,
+          issueIds: []
+        };
+      }
+
+      try {
+        const record = JSON.parse(saved);
+
+        // ถ้าเป็นวันใหม่ ให้เริ่มนับสิทธิ์โหวตใหม่
+        if (!record.date || record.date !== today) {
+          return {
+            date: today,
+            issueIds: []
+          };
+        }
+
+        return {
+          date: record.date,
+          issueIds: Array.isArray(record.issueIds) ? record.issueIds : []
+        };
+      } catch {
+        return {
+          date: today,
+          issueIds: []
+        };
+      }
+    }
+
+    function saveVoteRecord() {
+      localStorage.setItem(VOTED_ISSUES_KEY, JSON.stringify(voteRecord));
+    }
+
+    function loadStaffSession() {
+      const saved = localStorage.getItem(STAFF_SESSION_KEY);
+      if (!saved) return null;
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return null;
+      }
+    }
+
+    function isStaffLoggedIn() {
+      return staffSession && staffSession.loggedIn === true;
+    }
+
+    function requireStaff(actionText = "จัดการเคส") {
+      if (isStaffLoggedIn()) return true;
+      showToast("ต้องเป็นเจ้าหน้าที่ก่อน", `กรุณาเข้าสู่ระบบเจ้าหน้าที่ก่อน${actionText}`, "🔐");
+      openTab("adminTab");
+      return false;
+    }
+
+    function loginStaff() {
+      const role = document.getElementById("staffRoleSelect").value;
+      const code = document.getElementById("staffCodeInput").value.trim();
+      const account = staffAccounts.find(item => item.role === role && item.code === code);
+
+      if (!account) {
+        showToast("รหัสไม่ถูกต้อง", "กรุณาตรวจสอบบทบาทและรหัสเจ้าหน้าที่อีกครั้ง", "🔐");
+        return;
+      }
+
+      staffSession = {
+        loggedIn: true,
+        role: account.role,
+        name: account.name,
+        department: account.department,
+        loginAt: getThaiDateTime()
+      };
+      localStorage.setItem(STAFF_SESSION_KEY, JSON.stringify(staffSession));
+      document.getElementById("staffCodeInput").value = "";
+      showToast("เข้าสู่โหมดเจ้าหน้าที่แล้ว", `${staffSession.name} สามารถรับงานและอัปเดตเคสได้`, "✅");
+      renderAll();
+    }
+
+    function logoutStaff() {
+      staffSession = null;
+      localStorage.removeItem(STAFF_SESSION_KEY);
+      showToast("ออกจากโหมดเจ้าหน้าที่แล้ว", "ตอนนี้จะไม่สามารถรับงานหรือเปลี่ยนสถานะเคสได้", "👋");
+      renderAll();
+    }
+
+    function showDemoCodes() {
+      showToast("รหัสเดโม", "SAFE123, BUILD123, CARE123, HEALTH123, ADMIN123", "🧾");
+    }
+
+    function renderStaffGate() {
+      const staffGate = document.getElementById("staffGate");
+      const adminTools = document.getElementById("adminTools");
+      const sessionCard = document.getElementById("staffSessionCard");
+      if (!staffGate || !adminTools || !sessionCard) return;
+
+      if (isStaffLoggedIn()) {
+        staffGate.style.display = "none";
+        adminTools.classList.remove("locked");
+        sessionCard.classList.add("show");
+        sessionCard.innerHTML = `
+          <strong>✅ อยู่ในโหมดเจ้าหน้าที่:</strong> ${escapeHtml(staffSession.name)}<br>
+          บทบาท: ${escapeHtml(staffSession.role)} | ฝ่ายรับผิดชอบหลัก: ${escapeHtml(staffSession.department)} | เข้าระบบเมื่อ: ${escapeHtml(staffSession.loginAt)}<br>
+          <button class="btn btn-ghost" onclick="logoutStaff()" style="margin-top:10px;">ออกจากโหมดเจ้าหน้าที่</button>
+        `;
+      } else {
+        staffGate.style.display = "block";
+        adminTools.classList.add("locked");
+        sessionCard.classList.remove("show");
+        sessionCard.innerHTML = "";
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getThaiDateTime() {
+      return new Date().toLocaleString("th-TH", {
+        dateStyle: "short",
+        timeStyle: "short"
+      });
+    }
+
+    function createMapPoint(location, seed = Date.now()) {
+      const zone = locationMapData[location] || locationMapData["อื่น ๆ"];
+      const n = Number(String(seed).slice(-4)) || 1;
+      const jitterX = ((n % 9) - 4) * 0.9;
+      const jitterY = ((Math.floor(n / 9) % 9) - 4) * 0.7;
+      const x = Math.max(4, Math.min(96, zone.x + zone.w / 2 + jitterX));
+      const y = Math.max(6, Math.min(96, zone.y + zone.h / 2 + jitterY));
+      return { x, y };
+    }
+
+    function getIssuePoint(issue) {
+      if (issue.mapPoint && typeof issue.mapPoint.x === "number" && typeof issue.mapPoint.y === "number") {
+        return issue.mapPoint;
+      }
+      return createMapPoint(issue.location, issue.id);
+    }
+
+    function getPinClass(urgency) {
+      if (urgency === "ฉุกเฉิน") return "urgency-emergency";
+      if (urgency === "สูง") return "urgency-high";
+      if (urgency === "กลาง") return "urgency-medium";
+      return "urgency-low";
+    }
+
+    imageInput.addEventListener("change", function () {
+      const file = imageInput.files[0];
+      if (!file) {
+        activeImageData = "";
+        imagePreview.innerHTML = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        activeImageData = event.target.result;
+        imagePreview.innerHTML = `<img class="preview-img" src="${activeImageData}" alt="ภาพตัวอย่าง" />`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    issueForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const role = document.getElementById("reporterRole").value;
+      const anonymous = document.getElementById("anonymous").value;
+      const studentName = document.getElementById("studentName").value.trim();
+      const location = document.getElementById("location").value;
+      const subLocation = document.getElementById("subLocation").value.trim();
+      const text = document.getElementById("issueText").value.trim();
+
+      if (!location || !text) {
+        showToast("กรอกข้อมูลยังไม่ครบ", "กรุณาเลือกพื้นที่และเล่าเหตุการณ์ที่พบก่อนค่ะ", "📝");
+        return;
+      }
+
+      const ai = analyzeIssue(text, location);
+      const id = Date.now();
+      const ticket = "SCV-" + String(id).slice(-6);
+      const nameToShow = anonymous === "ไม่เปิดเผยชื่อ" ? "ไม่เปิดเผยชื่อ" : (studentName || role);
+      const similarIssues = findSimilarIssues(text, location, ai.category);
+
+      const newIssue = {
+        id,
+        ticket,
+        role,
+        name: nameToShow,
+        location,
+        subLocation: subLocation || "-",
+        text,
+        category: ai.category,
+        urgency: ai.urgency,
+        department: ai.department,
+        summary: ai.summary,
+        status: "รอรับเรื่อง",
+        votes: 0,
+        imageData: activeImageData,
+        mapPoint: createMapPoint(location, id),
+        assignedTo: "",
+        assignedRole: "",
+        createdAt: getThaiDateTime(),
+        timeline: [
+          {
+            time: getThaiDateTime(),
+            status: "รอรับเรื่อง",
+            note: "ระบบรับเรื่องจากผู้แจ้งและให้ AI วิเคราะห์เบื้องต้นแล้ว"
+          }
+        ]
+      };
+
+      issues.unshift(newIssue);
+      saveIssues();
+
+      showAiResult(newIssue, similarIssues);
+      showToast("รับเรื่องแล้วค่ะ", "AI ช่วยจัดหมวดหมู่และสรุปปัญหาให้เรียบร้อยแล้ว", "🤖");
+      openAiModal(newIssue, similarIssues);
+
+      issueForm.reset();
+      activeImageData = "";
+      imagePreview.innerHTML = "";
+      document.getElementById("anonymous").value = "ไม่เปิดเผยชื่อ";
+
+      renderAll();
+    });
+
+    function analyzeIssue(text, location) {
+      const lowerText = text.toLowerCase();
+
+      const categoryRules = [
+        {
+          category: "ห้องน้ำ/สุขอนามัย",
+          department: "งานอาคารสถานที่",
+          keywords: ["ห้องน้ำ", "เหม็น", "น้ำไม่ไหล", "สกปรก", "ชักโครก", "อ่างล้างมือ", "สุขอนามัย"]
+        },
+        {
+          category: "ความปลอดภัย",
+          department: "ครูเวร/งานความปลอดภัย",
+          keywords: ["ลื่น", "ไฟดับ", "สายไฟ", "อันตราย", "บาดเจ็บ", "แก้วแตก", "ตก", "หล่น", "ไฟไหม้", "ประตูพัง"]
+        },
+        {
+          category: "การบูลลี่/ความสัมพันธ์",
+          department: "งานแนะแนว/ครูที่ปรึกษา",
+          keywords: ["แกล้ง", "บูลลี่", "ล้อ", "ด่า", "ทำร้าย", "คุกคาม", "ข่มขู่", "กลั่นแกล้ง"]
+        },
+        {
+          category: "สุขภาพใจ",
+          department: "งานแนะแนว/ครูที่ปรึกษา",
+          keywords: ["เครียด", "กังวล", "เศร้า", "ไม่ไหว", "ร้องไห้", "โดดเดี่ยว", "เหนื่อยใจ", "กลัว"]
+        },
+        {
+          category: "อุปกรณ์ชำรุด",
+          department: "งานอาคารสถานที่",
+          keywords: ["พัดลม", "โปรเจกเตอร์", "โต๊ะ", "เก้าอี้", "คอม", "คอมพิวเตอร์", "ประตู", "หน้าต่าง", "เสีย", "ชำรุด"]
+        },
+        {
+          category: "สิ่งแวดล้อม/ความสะอาด",
+          department: "งานอนามัย/แม่บ้าน",
+          keywords: ["ขยะ", "น้ำขัง", "ฝุ่น", "กลิ่น", "ร้อน", "แมลง", "ยุง", "สกปรก", "ใบไม้"]
+        },
+        {
+          category: "การเรียน/สภาพแวดล้อม",
+          department: "ฝ่ายบริหารทั่วไป",
+          keywords: ["เสียงดัง", "แออัด", "เรียน", "ห้องเรียน", "อินเทอร์เน็ต", "ไวไฟ", "wifi", "สัญญาณ"]
+        }
+      ];
+
+      let bestRule = null;
+      let bestScore = 0;
+
+      categoryRules.forEach(rule => {
+        let score = 0;
+        rule.keywords.forEach(keyword => {
+          if (lowerText.includes(keyword.toLowerCase())) score++;
+        });
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestRule = rule;
+        }
+      });
+
+      let category = bestRule ? bestRule.category : "ปัญหาทั่วไป";
+      let department = bestRule ? bestRule.department : "ฝ่ายบริหารทั่วไป";
+
+      let urgencyScore = 0;
+      const emergencyWords = ["ไฟไหม้", "เลือด", "ทำร้าย", "คุกคาม", "ข่มขู่", "สายไฟ", "บาดเจ็บ", "แก้วแตก"];
+      const highWords = ["ลื่น", "อันตราย", "ไม่ไหว", "บูลลี่", "หลายวัน", "น้ำไม่ไหล", "เหม็นมาก", "เกือบล้ม", "กลั่นแกล้ง"];
+      const mediumWords = ["เสีย", "ชำรุด", "ขยะ", "น้ำขัง", "สกปรก", "ร้อน", "ฝุ่น", "แมลง"];
+
+      emergencyWords.forEach(word => { if (lowerText.includes(word)) urgencyScore += 5; });
+      highWords.forEach(word => { if (lowerText.includes(word)) urgencyScore += 3; });
+      mediumWords.forEach(word => { if (lowerText.includes(word)) urgencyScore += 1; });
+
+      if (category === "การบูลลี่/ความสัมพันธ์" || category === "สุขภาพใจ") urgencyScore += 2;
+      if (category === "ความปลอดภัย") urgencyScore += 2;
+
+      let urgency = "ต่ำ";
+      if (urgencyScore >= 5) urgency = "ฉุกเฉิน";
+      else if (urgencyScore >= 3) urgency = "สูง";
+      else if (urgencyScore >= 1) urgency = "กลาง";
+
+      const summary = `AI วิเคราะห์ว่าเป็นปัญหา "${category}" บริเวณ ${location} มีระดับความเร่งด่วน "${urgency}" ควรส่งต่อให้ ${department} ตรวจสอบ รายละเอียดจากผู้แจ้งคือ: ${text}`;
+
+      return { category, urgency, department, summary };
+    }
+
+    function findSimilarIssues(text, location, category) {
+      const words = text.split(/\s+/).filter(word => word.length > 2);
+      return issues.filter(issue => {
+        const sameLocation = issue.location === location;
+        const sameCategory = issue.category === category;
+        const overlap = words.some(word => issue.text.includes(word));
+        return sameLocation || sameCategory || overlap;
+      }).slice(0, 3);
+    }
+
+    function showAiResult(issue, similarIssues) {
+      const aiResult = document.getElementById("aiResult");
+      aiResult.classList.add("show");
+      document.getElementById("resultTicket").textContent = issue.ticket;
+      document.getElementById("resultCategory").textContent = issue.category;
+      document.getElementById("resultUrgency").innerHTML = getUrgencyBadge(issue.urgency);
+      document.getElementById("resultDepartment").textContent = issue.department;
+      document.getElementById("resultSummary").textContent = issue.summary;
+
+      if (similarIssues.length === 0) {
+        document.getElementById("resultSimilar").textContent = "ยังไม่พบปัญหาคล้ายกัน";
+      } else {
+        document.getElementById("resultSimilar").innerHTML = similarIssues
+          .map(item => `${escapeHtml(item.ticket)} (${escapeHtml(item.category)})`)
+          .join(", ");
+      }
+    }
+
+    function getUrgencyBadge(urgency) {
+      if (urgency === "ฉุกเฉิน") return `<span class="badge badge-emergency">ฉุกเฉิน</span>`;
+      if (urgency === "สูง") return `<span class="badge badge-high">สูง</span>`;
+      if (urgency === "กลาง") return `<span class="badge badge-medium">กลาง</span>`;
+      return `<span class="badge badge-low">ต่ำ</span>`;
+    }
+
+    function getStatusBadge(status) {
+      if (status === "รอรับเรื่อง") return `<span class="badge badge-status-wait">รอรับเรื่อง</span>`;
+      if (status === "รับเรื่องแล้ว") return `<span class="badge badge-status-accept">รับเรื่องแล้ว</span>`;
+      if (status === "กำลังดำเนินการ") return `<span class="badge badge-status-process">กำลังดำเนินการ</span>`;
+      if (status === "แก้ไขแล้ว") return `<span class="badge badge-status-done">แก้ไขแล้ว</span>`;
+      return `<span class="badge badge-status-close">ปิดเคส</span>`;
+    }
+
+    function showToast(title, text, icon = "✨") {
+      const toastWrap = document.getElementById("toastWrap");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div>
+          <div class="toast-title">${escapeHtml(title)}</div>
+          <div class="toast-text">${escapeHtml(text)}</div>
+        </div>
+      `;
+      toastWrap.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-8px) scale(0.96)";
+      }, 2800);
+
+      setTimeout(() => toast.remove(), 3300);
+    }
+
+    function openAiModal(issue, similarIssues = []) {
+      const backdrop = document.getElementById("aiModalBackdrop");
+      const body = document.getElementById("aiModalBody");
+      const similarText = similarIssues.length === 0
+        ? "ยังไม่พบปัญหาคล้ายกันในระบบ"
+        : similarIssues.map(item => `${item.ticket} (${item.category})`).join(", ");
+
+      body.innerHTML = `
+        <div class="modal-line"><strong>เลขเคส :</strong> ${escapeHtml(issue.ticket)}</div>
+        <div class="modal-line"><strong>หมวดหมู่ :</strong> ${escapeHtml(issue.category)}</div>
+        <div class="modal-line"><strong>ระดับความเร่งด่วน :</strong> ${getUrgencyBadge(issue.urgency)}</div>
+        <div class="modal-line"><strong>ฝ่ายที่ควรรับผิดชอบ :</strong> ${escapeHtml(issue.department)}</div>
+        <div class="modal-line"><strong>AI สรุปให้ครู :</strong><br>${escapeHtml(issue.summary)}</div>
+        <div class="modal-line"><strong>ปัญหาคล้ายกัน :</strong> ${escapeHtml(similarText)}</div>
+        <button onclick="closeAiModal(); openTab('feedTab');" class="btn btn-mint">ไปหน้าติดตามปัญหา</button>
+      `;
+      backdrop.classList.add("show");
+    }
+
+    function closeAiModal() {
+      document.getElementById("aiModalBackdrop").classList.remove("show");
+    }
+
+    document.getElementById("aiModalBackdrop").addEventListener("click", function(event) {
+      if (event.target.id === "aiModalBackdrop") closeAiModal();
+    });
+
+    function renderAll() {
+      updateFilterOptions();
+      renderIssues();
+      renderVoteList();
+      renderDashboard();
+      renderMap();
+      renderAdminOptions();
+      renderStaffGate();
+      renderLab();
+    }
+
+    function updateFilterOptions() {
+      const currentCategory = document.getElementById("filterCategory").value || "ทั้งหมด";
+      const currentLocation = document.getElementById("filterLocation").value || "ทั้งหมด";
+
+      const categories = [...new Set(issues.map(issue => issue.category))];
+      const categoryHtml = `<option value="ทั้งหมด">ทุกหมวด</option>` +
+        categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("");
+      document.getElementById("filterCategory").innerHTML = categoryHtml;
+      document.getElementById("filterCategory").value = categories.includes(currentCategory) ? currentCategory : "ทั้งหมด";
+
+      const locationHtml = `<option value="ทั้งหมด">ทุกพื้นที่</option>` +
+        locations.map(location => `<option value="${escapeHtml(location)}">${escapeHtml(location)}</option>`).join("");
+      document.getElementById("filterLocation").innerHTML = locationHtml;
+      document.getElementById("filterLocation").value = locations.includes(currentLocation) ? currentLocation : "ทั้งหมด";
+    }
+
+    function getFilteredIssues() {
+      const search = document.getElementById("searchInput").value.trim().toLowerCase();
+      const category = document.getElementById("filterCategory").value;
+      const urgency = document.getElementById("filterUrgency").value;
+      const status = document.getElementById("filterStatus").value;
+      const location = document.getElementById("filterLocation").value;
+
+      return issues.filter(issue => {
+        const target = `${issue.ticket} ${issue.text} ${issue.category} ${issue.location} ${issue.subLocation} ${issue.department}`.toLowerCase();
+        const matchSearch = !search || target.includes(search);
+        const matchCategory = category === "ทั้งหมด" || issue.category === category;
+        const matchUrgency = urgency === "ทั้งหมด" || issue.urgency === urgency;
+        const matchStatus = status === "ทั้งหมด" || issue.status === status;
+        const matchLocation = location === "ทั้งหมด" || issue.location === location;
+        return matchSearch && matchCategory && matchUrgency && matchStatus && matchLocation;
+      });
+    }
+
+    function renderIssues() {
+      const filtered = getFilteredIssues();
+      const issueList = document.getElementById("issueList");
+
+      if (filtered.length === 0) {
+        issueList.innerHTML = `<div class="empty">ไม่พบรายการปัญหาตามเงื่อนไขที่เลือก<br>ลองเปลี่ยนคำค้นหาหรือกดแจ้งปัญหาใหม่ได้เลย</div>`;
+        return;
+      }
+
+      issueList.innerHTML = filtered.map(issue => issueCardHtml(issue, true)).join("");
+    }
+
+    function issueCardHtml(issue, showActions) {
+      const imageHtml = issue.imageData
+        ? `<img class="issue-img" src="${issue.imageData}" alt="ภาพปัญหา" />`
+        : "";
+
+      const assignedText = issue.assignedTo
+        ? `${escapeHtml(issue.assignedTo)} (${escapeHtml(issue.assignedRole || issue.department)})`
+        : "ยังไม่มีเจ้าหน้าที่รับผิดชอบ";
+
+      const timelineHtml = issue.timeline.map(item => `
+        <div class="timeline-item">
+          <strong>${escapeHtml(item.time)}</strong> — ${getStatusBadge(item.status)} ${escapeHtml(item.note)}
+        </div>
+      `).join("");
+
+      const studentActions = showActions ? `
+        <button class="btn btn-mint" onclick="supportIssue('${issue.id}')">🙋 เจอปัญหานี้เหมือนกัน +1</button>
+      ` : "";
+
+      const staffControls = showActions
+        ? (isStaffLoggedIn()
+          ? `
+            <div class="staff-controls">
+              <button class="btn btn-primary" onclick="acceptIssue('${issue.id}')">🧑‍🏫 รับงาน</button>
+              <select onchange="updateStatusQuick('${issue.id}', this.value)">
+                <option value="รอรับเรื่อง" ${issue.status === "รอรับเรื่อง" ? "selected" : ""}>รอรับเรื่อง</option>
+                <option value="รับเรื่องแล้ว" ${issue.status === "รับเรื่องแล้ว" ? "selected" : ""}>รับเรื่องแล้ว</option>
+                <option value="กำลังดำเนินการ" ${issue.status === "กำลังดำเนินการ" ? "selected" : ""}>กำลังดำเนินการ</option>
+                <option value="แก้ไขแล้ว" ${issue.status === "แก้ไขแล้ว" ? "selected" : ""}>แก้ไขแล้ว</option>
+                <option value="ปิดเคส" ${issue.status === "ปิดเคส" ? "selected" : ""}>ปิดเคส</option>
+              </select>
+            </div>
+          `
+          : `<span class="locked-note">🔒 การรับงาน/เปลี่ยนสถานะทำได้เฉพาะเจ้าหน้าที่</span>`)
+        : "";
+
+      const actionsHtml = showActions ? `
+        <div class="card-actions">
+          ${studentActions}
+          ${staffControls}
+        </div>
+      ` : "";
+
+      return `
+        <div class="issue-card">
+          <h3>${escapeHtml(issue.ticket)} — ${escapeHtml(issue.category)} ${getUrgencyBadge(issue.urgency)} ${getStatusBadge(issue.status)}</h3>
+          <div class="issue-meta">
+            ผู้แจ้ง : ${escapeHtml(issue.name)} |
+            บทบาท : ${escapeHtml(issue.role)} |
+            พื้นที่ : ${escapeHtml(issue.location)} |
+            จุดย่อย : ${escapeHtml(issue.subLocation)} |
+            เวลา : ${escapeHtml(issue.createdAt)}
+          </div>
+          <p><strong>รายละเอียด :</strong> ${escapeHtml(issue.text)}</p>
+          ${imageHtml}
+          <div class="issue-summary"><strong>AI สรุป:</strong> ${escapeHtml(issue.summary)}</div>
+          <p><strong>ฝ่ายที่ควรรับผิดชอบ :</strong> ${escapeHtml(issue.department)}</p>
+          <p><strong>เจ้าหน้าที่รับผิดชอบ :</strong> ${assignedText}</p>
+          <p><strong>จำนวนคนที่เจอปัญหานี้เหมือนกัน :</strong> ${issue.votes} คน</p>
+          ${actionsHtml}
+          <div class="timeline">${timelineHtml}</div>
+        </div>
+      `;
+    }
+
+    function supportIssue(id) {
+      const issueId = String(id);
+
+      // โหลดข้อมูลโหวตของวันนี้อีกครั้ง เผื่อเปิดเว็บข้ามวัน
+      voteRecord = loadVoteRecord();
+
+      // กันโหวตซ้ำเคสเดิมในวันเดียวกัน
+      if (voteRecord.issueIds.includes(issueId)) {
+        showToast(
+          "กดสนับสนุนเคสนี้ไปแล้ว",
+          "เพื่อป้องกันการปั่น ระบบไม่ให้โหวตซ้ำเรื่องเดิมในวันเดียวกัน",
+          "🛡️"
+        );
+        return;
+      }
+
+      // จำกัด 1 เครื่อง โหวตได้ไม่เกิน 3 ครั้งต่อวัน
+      if (voteRecord.issueIds.length >= 3) {
+        showToast(
+          "ใช้สิทธิ์โหวตครบแล้ว",
+          "วันนี้เครื่องนี้โหวตครบ 3 ครั้งแล้ว กลับมาโหวตใหม่ได้พรุ่งนี้",
+          "⏰"
+        );
+        return;
+      }
+
+      issues = issues.map(issue => {
+        if (String(issue.id) === issueId) {
+          return {
+            ...issue,
+            votes: issue.votes + 1
+          };
+        }
+
+        return issue;
+      });
+
+      voteRecord.issueIds.push(issueId);
+
+      saveVoteRecord();
+      saveIssues();
+      renderAll();
+
+      const remainingVotes = 3 - voteRecord.issueIds.length;
+
+      showToast(
+        "ขอบคุณที่ช่วยยืนยันปัญหา",
+        `โหวตสำเร็จแล้ว วันนี้ยังเหลือสิทธิ์อีก ${remainingVotes} ครั้ง`,
+        "🙋"
+      );
+    }
+
+    function updateStatusQuick(id, newStatus) {
+      if (!requireStaff("เปลี่ยนสถานะ")) return;
+      issues = issues.map(issue => {
+        if (String(issue.id) === String(id)) {
+          return {
+            ...issue,
+            status: newStatus,
+            timeline: [
+              ...issue.timeline,
+              { time: getThaiDateTime(), status: newStatus, note: `${staffSession.name} อัปเดตสถานะจากหน้าติดตามปัญหา` }
+            ]
+          };
+        }
+        return issue;
+      });
+      saveIssues();
+      renderAll();
+      showToast("เปลี่ยนสถานะแล้ว", `อัปเดตสถานะเป็น ${newStatus}`, "📌");
+    }
+
+    function renderVoteList() {
+      const urgencyWeight = { "ฉุกเฉิน": 4, "สูง": 3, "กลาง": 2, "ต่ำ": 1 };
+      const sorted = [...issues].sort((a, b) => {
+        const scoreA = (urgencyWeight[a.urgency] || 0) * 10 + a.votes;
+        const scoreB = (urgencyWeight[b.urgency] || 0) * 10 + b.votes;
+        return scoreB - scoreA;
+      });
+
+      document.getElementById("voteList").innerHTML = sorted.map((issue, index) => `
+        <div class="issue-card">
+          <h3>อันดับ ${index + 1} : ${escapeHtml(issue.ticket)} — ${escapeHtml(issue.category)} ${getUrgencyBadge(issue.urgency)}</h3>
+          <div class="issue-meta">พื้นที่ : ${escapeHtml(issue.location)} | สถานะ : ${getStatusBadge(issue.status)}</div>
+          <p>${escapeHtml(issue.text)}</p>
+          <p><strong>คนกดเจอเหมือนกัน :</strong> ${issue.votes} คน</p>
+          <button class="btn btn-mint" onclick="supportIssue('${issue.id}')">🙋 เจอปัญหานี้เหมือนกัน +1</button>
+        </div>
+      `).join("");
+    }
+
+    function renderMap() {
+      const statusFilterEl = document.getElementById("mapFilterStatus");
+      const statusFilter = statusFilterEl ? statusFilterEl.value : "ทั้งหมด";
+      const visibleIssues = issues.filter(issue => statusFilter === "ทั้งหมด" || issue.status === statusFilter);
+
+      const zoneHtml = Object.entries(locationMapData).map(([key, zone]) => `
+        <div class="map-zone" onclick="filterByLocation('${escapeHtml(key)}')" style="left:${zone.x}%; top:${zone.y}%; width:${zone.w}%; height:${zone.h}%;">
+          <div class="map-zone-title">${zone.icon} ${escapeHtml(zone.label)}</div>
+          <div class="map-zone-sub">คลิกเพื่อดูปัญหาในพื้นที่นี้</div>
+        </div>
+      `).join("");
+
+      const pinHtml = visibleIssues.map(issue => {
+        const point = getIssuePoint(issue);
+        const icon = issue.urgency === "ฉุกเฉิน" ? "!" : issue.votes > 9 ? "★" : "•";
+        return `
+          <div class="map-pin ${getPinClass(issue.urgency)}" style="left:${point.x}%; top:${point.y}%;" title="${escapeHtml(issue.ticket)} ${escapeHtml(issue.category)}" onclick="showMapIssue('${issue.id}')">
+            <span>${icon}</span>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("schoolMap").innerHTML = `
+        <div class="campus-road main"></div>
+        <div class="campus-road vertical"></div>
+        ${zoneHtml}
+        ${pinHtml}
+      `;
+
+      const counts = {};
+      locations.forEach(location => counts[location] = 0);
+      issues.forEach(issue => {
+        if (!counts[issue.location]) counts[issue.location] = 0;
+        counts[issue.location]++;
+      });
+
+      document.getElementById("mapAreaStats").innerHTML = locations.map(location => {
+        const count = counts[location] || 0;
+        const urgentCount = issues.filter(issue =>
+          issue.location === location &&
+          (issue.urgency === "สูง" || issue.urgency === "ฉุกเฉิน")
+        ).length;
+        return `
+          <div class="map-card" onclick="filterByLocation('${escapeHtml(location)}')">
+            <h3>${escapeHtml(location)}</h3>
+            <p>จำนวนปัญหา : <strong>${count}</strong> รายการ</p>
+            <p>เร่งด่วนสูง/ฉุกเฉิน : <strong>${urgentCount}</strong> รายการ</p>
+            <p style="font-size:13px; margin-top:10px;">คลิกเพื่อดูรายการในพื้นที่นี้</p>
+          </div>
+        `;
+      }).join("");
+
+      const panel = document.getElementById("mapPanelContent");
+      if (panel && !panel.innerHTML.trim()) {
+        panel.innerHTML = visibleIssues.slice(0, 4).map(issue => mapMiniCard(issue)).join("") || `<div class="empty">ยังไม่มีหมุดในแผนที่</div>`;
+      }
+    }
+
+    function mapMiniCard(issue) {
+      return `
+        <div class="map-mini-card" onclick="showMapIssue('${issue.id}')">
+          <strong>${escapeHtml(issue.ticket)}</strong> ${getUrgencyBadge(issue.urgency)} ${getStatusBadge(issue.status)}
+          <p style="margin:8px 0 0; color:#475569; line-height:1.55;">${escapeHtml(issue.location)} — ${escapeHtml(issue.text)}</p>
+        </div>
+      `;
+    }
+
+    function showMapIssue(id) {
+      const issue = issues.find(item => String(item.id) === String(id));
+      if (!issue) return;
+      document.getElementById("mapPanelContent").innerHTML = issueCardHtml(issue, true);
+      showToast("เปิดรายละเอียดหมุด", `${issue.ticket} บริเวณ${issue.location}`, "📍");
+    }
+
+    function resetMapPanel() {
+      const statusFilterEl = document.getElementById("mapFilterStatus");
+      const statusFilter = statusFilterEl ? statusFilterEl.value : "ทั้งหมด";
+      const visibleIssues = issues.filter(issue => statusFilter === "ทั้งหมด" || issue.status === statusFilter);
+      document.getElementById("mapPanelContent").innerHTML = visibleIssues.map(issue => mapMiniCard(issue)).join("") || `<div class="empty">ยังไม่มีหมุดในแผนที่</div>`;
+      renderMap();
+    }
+
+    function filterByLocation(location) {
+      openTab("feedTab");
+      document.getElementById("filterLocation").value = location;
+      renderIssues();
+    }
+
+    function renderDashboard() {
+      const total = issues.length;
+      const urgent = issues.filter(issue => issue.urgency === "สูง" || issue.urgency === "ฉุกเฉิน").length;
+      const solved = issues.filter(issue => issue.status === "แก้ไขแล้ว" || issue.status === "ปิดเคส").length;
+      const votes = issues.reduce((sum, issue) => sum + issue.votes, 0);
+
+      document.getElementById("totalIssues").textContent = total;
+      document.getElementById("urgentIssues").textContent = urgent;
+      document.getElementById("solvedIssues").textContent = solved;
+      document.getElementById("totalVotes").textContent = votes;
+
+      const categoryCount = countBy("category");
+      const locationCount = countBy("location");
+      const statusCount = countBy("status");
+
+      document.getElementById("topCategory").textContent = getTopKey(categoryCount);
+      document.getElementById("topLocation").textContent = getTopKey(locationCount);
+      document.getElementById("topStatus").textContent = getTopKey(statusCount);
+
+      document.getElementById("categoryChart").innerHTML = renderBars(categoryCount);
+      document.getElementById("locationChart").innerHTML = renderBars(locationCount);
+      document.getElementById("statusChart").innerHTML = renderBars(statusCount);
+    }
+
+    function countBy(key) {
+      const result = {};
+      issues.forEach(issue => {
+        const value = issue[key] || "-";
+        if (!result[value]) result[value] = 0;
+        result[value]++;
+      });
+      return result;
+    }
+
+    function getTopKey(countObj) {
+      let top = "-";
+      let max = 0;
+      Object.keys(countObj).forEach(key => {
+        if (countObj[key] > max) {
+          max = countObj[key];
+          top = key;
+        }
+      });
+      return top;
+    }
+
+    function renderBars(countObj) {
+      const entries = Object.entries(countObj).sort((a, b) => b[1] - a[1]);
+      const max = entries.length ? Math.max(...entries.map(item => item[1])) : 1;
+      if (entries.length === 0) return `<div class="empty">ยังไม่มีข้อมูล</div>`;
+
+      return entries.map(([label, value]) => {
+        const percent = Math.max((value / max) * 100, 5);
+        return `
+          <div class="bar-row">
+            <div class="bar-label"><span>${escapeHtml(label)}</span><span>${value}</span></div>
+            <div class="bar-bg"><div class="bar-fill" style="width:${percent}%"></div></div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderAdminOptions() {
+      const adminIssueSelect = document.getElementById("adminIssueSelect");
+      const current = adminIssueSelect.value;
+
+      adminIssueSelect.innerHTML = issues.map(issue => `
+        <option value="${issue.id}">
+          ${escapeHtml(issue.ticket)} | ${escapeHtml(issue.category)} | ${escapeHtml(issue.location)} | ${escapeHtml(issue.status)}
+        </option>
+      `).join("");
+
+      if (issues.some(issue => String(issue.id) === String(current))) {
+        adminIssueSelect.value = current;
+      }
+
+      const selected = issues.find(issue => String(issue.id) === String(adminIssueSelect.value)) || issues[0];
+      if (selected) {
+        document.getElementById("adminStatus").value = selected.status;
+        document.getElementById("adminDepartment").value = selected.department;
+      }
+    }
+
+    document.getElementById("staffLoginBtn").addEventListener("click", loginStaff);
+    document.getElementById("staffDemoBtn").addEventListener("click", showDemoCodes);
+    document.getElementById("mapFilterStatus").addEventListener("change", function () {
+      document.getElementById("mapPanelContent").innerHTML = "";
+      renderMap();
+      resetMapPanel();
+    });
+    document.getElementById("acceptSelectedBtn").addEventListener("click", function () {
+      const id = document.getElementById("adminIssueSelect").value;
+      acceptIssue(id);
+    });
+
+    document.getElementById("adminIssueSelect").addEventListener("change", function () {
+      const selected = issues.find(issue => String(issue.id) === String(this.value));
+      if (!selected) return;
+      document.getElementById("adminStatus").value = selected.status;
+      document.getElementById("adminDepartment").value = selected.department;
+    });
+
+    document.getElementById("adminUpdateBtn").addEventListener("click", function () {
+      if (!requireStaff("บันทึกการอัปเดต")) return;
+      const id = document.getElementById("adminIssueSelect").value;
+      const newStatus = document.getElementById("adminStatus").value;
+      const newDepartment = document.getElementById("adminDepartment").value;
+      const note = document.getElementById("adminNote").value.trim() || "อัปเดตข้อมูลโดยครู/ผู้ดูแลระบบ";
+
+      issues = issues.map(issue => {
+        if (String(issue.id) === String(id)) {
+          return {
+            ...issue,
+            status: newStatus,
+            department: newDepartment,
+            assignedTo: issue.assignedTo || staffSession.name,
+            assignedRole: issue.assignedRole || staffSession.role,
+            timeline: [
+              ...issue.timeline,
+              { time: getThaiDateTime(), status: newStatus, note }
+            ]
+          };
+        }
+        return issue;
+      });
+
+      document.getElementById("adminNote").value = "";
+      saveIssues();
+      renderAll();
+      showToast("อัปเดตเคสเรียบร้อย", "บันทึกสถานะและ Timeline ให้แล้วค่ะ", "✅");
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", function () {
+      if (!requireStaff("ส่งออกข้อมูล")) return;
+      exportCSV();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      if (!requireStaff("รีเซ็ตข้อมูล")) return;
+      if (!confirm("ต้องการรีเซ็ตข้อมูลเดโมทั้งหมดใช่ไหม?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(VOTED_ISSUES_KEY);
+      voteRecord = {
+        date: getTodayKey(),
+        issueIds: []
+      };
+      issues = JSON.parse(JSON.stringify(defaultIssues));
+      saveIssues();
+      renderAll();
+      showToast("รีเซ็ตข้อมูลเดโมแล้ว", "ระบบกลับไปใช้ข้อมูลตัวอย่างเริ่มต้น", "🔄");
+    });
+
+    function exportCSV() {
+      const header = ["ticket", "createdAt", "name", "role", "location", "subLocation", "category", "urgency", "department", "status", "assignedTo", "assignedRole", "votes", "text", "summary"];
+      const rows = issues.map(issue => [
+        issue.ticket, issue.createdAt, issue.name, issue.role, issue.location, issue.subLocation,
+        issue.category, issue.urgency, issue.department, issue.status, issue.assignedTo || "", issue.assignedRole || "", issue.votes, issue.text, issue.summary
+      ]);
+
+      const csv = [header, ...rows]
+        .map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "school-care-voice-issues.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Export CSV แล้ว", "ดาวน์โหลดข้อมูลเคสสำหรับทำรายงานเรียบร้อย", "📄");
+    }
+
+    function tokenizeThaiText(text) {
+      const stopWords = ["และ", "ใน", "ที่", "มี", "มาก", "ไม่", "จน", "แต่", "หลัง", "ทุกวัน", "แล้ว", "ได้"];
+      const cleaned = text.toLowerCase().replace(/[.,!?;:()"'“”]/g, " ");
+      return cleaned
+        .split(/\s+/)
+        .map(word => word.trim())
+        .filter(word => word.length > 1)
+        .filter(word => !stopWords.includes(word));
+    }
+
+    function trainLabModel() {
+      const model = {};
+      const categoryCounts = {};
+
+      labDataset.forEach(item => {
+        const label = item.label;
+        const words = tokenizeThaiText(item.text);
+        if (!model[label]) {
+          model[label] = {};
+          categoryCounts[label] = 0;
+        }
+        categoryCounts[label]++;
+        words.forEach(word => {
+          if (!model[label][word]) model[label][word] = 0;
+          model[label][word]++;
+        });
+      });
+
+      labModel = { wordCountByCategory: model, categoryCounts };
+      renderLab();
+    }
+
+    function predictWithLabModel(text) {
+      if (!labModel) return { category: "-", confidence: 0, matchedWords: [] };
+
+      const words = tokenizeThaiText(text);
+      const scores = {};
+      const matchedByCategory = {};
+
+      Object.keys(labModel.wordCountByCategory).forEach(category => {
+        scores[category] = 0;
+        matchedByCategory[category] = [];
+
+        words.forEach(word => {
+          const wordScore = labModel.wordCountByCategory[category][word] || 0;
+          if (wordScore > 0) {
+            scores[category] += wordScore;
+            matchedByCategory[category].push(word);
+          }
+        });
+
+        scores[category] += labModel.categoryCounts[category] * 0.1;
+      });
+
+      let bestCategory = "-";
+      let bestScore = 0;
+      let totalScore = 0;
+
+      Object.keys(scores).forEach(category => {
+        totalScore += scores[category];
+        if (scores[category] > bestScore) {
+          bestScore = scores[category];
+          bestCategory = category;
+        }
+      });
+
+      const confidence = totalScore === 0 ? 0 : Math.round((bestScore / totalScore) * 100);
+      return { category: bestCategory, confidence, matchedWords: matchedByCategory[bestCategory] || [] };
+    }
+
+    function calculateLabAccuracy() {
+      if (!labModel) return "-";
+      let correct = 0;
+      labDataset.forEach(item => {
+        const prediction = predictWithLabModel(item.text);
+        if (prediction.category === item.label) correct++;
+      });
+      return Math.round((correct / labDataset.length) * 100) + "%";
+    }
+
+    function renderLab() {
+      const categories = [...new Set(labDataset.map(item => item.label))];
+
+      document.getElementById("labDatasetCount").textContent = labDataset.length;
+      document.getElementById("labCategoryCount").textContent = categories.length;
+      document.getElementById("labAccuracy").textContent = calculateLabAccuracy();
+      document.getElementById("labModelStatus").textContent = labModel ? "Train แล้ว" : "ยังไม่ Train";
+
+      document.getElementById("labDatasetTable").innerHTML = labDataset.map((item, index) => `
+        <div class="issue-card">
+          <h3>ข้อมูลที่ ${index + 1}</h3>
+          <p><strong>ข้อความ :</strong> ${escapeHtml(item.text)}</p>
+          <p><strong>Label :</strong> <span class="badge badge-medium">${escapeHtml(item.label)}</span></p>
+        </div>
+      `).join("");
+
+      if (!labModel) {
+        document.getElementById("labFeatureBox").innerHTML = "ยังไม่ได้ Train Model";
+        return;
+      }
+
+      document.getElementById("labFeatureBox").innerHTML = Object.keys(labModel.wordCountByCategory).map(category => {
+        const words = Object.entries(labModel.wordCountByCategory[category])
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([word, count]) => `<span class="badge badge-low">${escapeHtml(word)} (${count})</span>`)
+          .join(" ");
+
+        return `
+          <div style="margin-bottom:14px;">
+            <strong>${escapeHtml(category)}</strong><br>
+            ${words}
+          </div>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("trainModelBtn").addEventListener("click", function () {
+      trainLabModel();
+      showToast("Train AI Model แล้ว", "ระบบเรียนรู้คำสำคัญจาก Dataset ตัวอย่างเรียบร้อย", "🧠");
+    });
+
+    document.getElementById("labPredictBtn").addEventListener("click", function () {
+      const text = document.getElementById("labTestInput").value.trim();
+
+      if (!text) {
+        showToast("ยังไม่มีข้อความ", "กรุณาพิมพ์ข้อความที่ต้องการให้ AI ทำนายก่อนค่ะ", "🧪");
+        return;
+      }
+
+      if (!labModel) {
+        showToast("ยังไม่ได้ Train Model", "กดปุ่ม Train AI Model ก่อนนะคะ", "🧠");
+        return;
+      }
+
+      const prediction = predictWithLabModel(text);
+      const result = document.getElementById("labPredictResult");
+      result.classList.add("show");
+      document.getElementById("labPredictedCategory").textContent = prediction.category;
+      document.getElementById("labConfidence").textContent = prediction.confidence + "%";
+      document.getElementById("labMatchedWords").textContent =
+        prediction.matchedWords.length > 0
+          ? prediction.matchedWords.join(", ")
+          : "ไม่พบคำที่ตรงกับข้อมูลฝึก แต่ระบบเลือกจากคะแนนรวมของหมวด";
+    });
+
+    [document.getElementById("searchInput"), document.getElementById("filterCategory"),
+     document.getElementById("filterUrgency"), document.getElementById("filterStatus"),
+     document.getElementById("filterLocation")].forEach(input => {
+      input.addEventListener("input", renderIssues);
+      input.addEventListener("change", renderIssues);
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
